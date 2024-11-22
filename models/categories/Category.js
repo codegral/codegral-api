@@ -23,7 +23,7 @@ const Schema = new mongoose.Schema(
         message: "Invalid category name.",
       },
       required: [true, "Content must belong to at least one category."],
-      unique: [true, "ASDSA"],
+      unique: true,
       lowercase: true,
       trim: true,
     },

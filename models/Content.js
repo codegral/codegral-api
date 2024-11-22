@@ -85,6 +85,8 @@ const Schema = new mongoose.Schema(
         message: "Invalid content type.",
       },
       required: [true, "Content type must be specified."],
+      lowercase: true,
+      trim: true,
     },
   },
   {

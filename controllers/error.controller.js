@@ -13,6 +13,16 @@ function validationError(err) {
 
 // ! 409: Duplicate Key Error
 function duplicateKeyError(err) {
+  if (err.keyValue.hasOwnProperty("content_title")) {
+    const content_title = getDuplicateKeyValue(err.keyValue, "content_title");
+
+    return createAppError(
+      409,
+      "fail",
+      `Content ${content_title} is already exists.`
+    );
+  }
+
   if (err.keyValue.hasOwnProperty("category_name")) {
     const category_name = getDuplicateKeyValue(err.keyValue, "category_name");
 

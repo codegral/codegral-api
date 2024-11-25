@@ -26,7 +26,7 @@ exports.getCategory = async function (req, res, next) {
 
 exports.createCategory = async function (req, res, next) {
   try {
-    const { category_name, sub_category_name } = req.body;
+    const { category_name } = req.body;
 
     const category = await Category.create({
       category_name: category_name.toLowerCase(),

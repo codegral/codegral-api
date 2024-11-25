@@ -43,29 +43,29 @@ const Schema = new mongoose.Schema(
       },
     ],
 
-    content_footer: [
-      {
-        content_footer_title: {
-          type: String,
-          trim: true,
-        },
+    // content_footer: [
+    //   {
+    //     content_footer_title: {
+    //       type: String,
+    //       trim: true,
+    //     },
 
-        content_footer_paragraph: {
-          type: String,
-          trim: true,
-        },
+    //     content_footer_paragraph: {
+    //       type: String,
+    //       trim: true,
+    //     },
 
-        content_footer_lists: {
-          type: [String],
-          trim: true,
-        },
+    //     content_footer_lists: {
+    //       type: [String],
+    //       trim: true,
+    //     },
 
-        content_footer_image: {
-          type: String,
-          trim: true,
-        },
-      },
-    ],
+    //     content_footer_image: {
+    //       type: String,
+    //       trim: true,
+    //     },
+    //   },
+    // ],
 
     content_categories: {
       type: [mongoose.Schema.Types.ObjectId],
@@ -81,7 +81,7 @@ const Schema = new mongoose.Schema(
     content_type: {
       type: String,
       enum: {
-        values: ["news", "content"],
+        values: ["news", "content", "tutorial"],
         message: "Invalid content type.",
       },
       required: [true, "Content type must be specified."],

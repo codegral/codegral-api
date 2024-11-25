@@ -10,9 +10,4 @@ router.use(checkApiKey);
 router.use("/contents", require("./content/content.routes"));
 router.use("/categories", require("./category/category.routes"));
 
-router.use(
-  "/subcategories",
-  require("./category/subcategory/subcategory.routes")
-);
-
 module.exports = router;

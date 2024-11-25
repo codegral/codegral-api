@@ -17,4 +17,7 @@ router
   .patch(updateCategory)
   .delete(deleteCategory);
 
+// * Nested Route(s)
+router.use("/sub/subcategories", require("./subcategory/subcategory.routes"));
+
 module.exports = router;

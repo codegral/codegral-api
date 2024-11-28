@@ -41,12 +41,14 @@ const Schema = new mongoose.Schema(
   }
 );
 
+// * Virtual Populating
 Schema.virtual("category_contents", {
   ref: "Content",
   foreignField: "content_categories",
   localField: "_id",
 });
 
+// * Query Middleware
 Schema.pre("findOne", function (next) {
   this.populate("category_contents");
 

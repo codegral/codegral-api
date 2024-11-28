@@ -5,15 +5,15 @@ const {
   getContents,
   createContent,
   getContent,
-} = require("../../controllers/content.controllers");
+} = require("../../controllers/content/content.controllers");
 
 const {
   checkCategoryValid,
-} = require("../../middlewares/category/category.middleware");
+} = require("../../middlewares/category/category.middlewares");
 
 const {
   checkSubcategoriesValid,
-} = require("../../middlewares/subcategory/subcategory.middleware");
+} = require("../../middlewares/subcategory/subcategory.middlewares");
 
 router
   .route("/")

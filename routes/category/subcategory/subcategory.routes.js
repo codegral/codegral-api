@@ -6,7 +6,7 @@ const {
   getSubcategory,
   updateSubcategory,
   deleteSubcategory,
-} = require("../../../controllers/subcategory.controllers");
+} = require("../../../controllers/subcategory/subcategory.controllers");
 
 router.route("/").get(getSubcategories);
 

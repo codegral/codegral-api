@@ -8,7 +8,7 @@ const http = require("http");
 const mongoose = require("mongoose");
 const routes = require("./routes/index.routes");
 const { createAppError } = require("./utils/helpers/error.helpers");
-const errorController = require("./controllers/error.controller");
+const errorController = require("./controllers/error/error.controller");
 
 // * ENV
 dotenv.config({ path: ".env" });

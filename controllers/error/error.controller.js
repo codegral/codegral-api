@@ -2,9 +2,9 @@ const {
   getValidationErrorMessage,
   getDuplicateKeyValue,
   createAppError,
-} = require("../utils/helpers/error.helpers");
+} = require("../../utils/helpers/error.helpers");
 
-const Response = require("../utils/Response");
+const Response = require("../../utils/Response");
 
 // ! 403: Validation Error
 function validationError(err) {

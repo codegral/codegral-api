@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { generateSlug } = require("../utils/helpers/index.helpers");
 
 const Schema = new mongoose.Schema(
   {
@@ -40,32 +41,13 @@ const Schema = new mongoose.Schema(
           type: String,
           trim: true,
         },
+
+        content_body_video: {
+          type: String,
+          trim: true,
+        },
       },
     ],
-
-    // content_footer: [
-    //   {
-    //     content_footer_title: {
-    //       type: String,
-    //       trim: true,
-    //     },
-
-    //     content_footer_paragraph: {
-    //       type: String,
-    //       trim: true,
-    //     },
-
-    //     content_footer_lists: {
-    //       type: [String],
-    //       trim: true,
-    //     },
-
-    //     content_footer_image: {
-    //       type: String,
-    //       trim: true,
-    //     },
-    //   },
-    // ],
 
     content_categories: {
       type: [mongoose.Schema.Types.ObjectId],
@@ -78,14 +60,30 @@ const Schema = new mongoose.Schema(
       ref: "Subcategory",
     },
 
-    content_type: {
+    content_slug: {
       type: String,
-      enum: {
-        values: ["news", "content", "tutorial"],
-        message: "Invalid content type.",
+      unique: true,
+      trim: true,
+    },
+
+    content_meta_description: {
+      type: String,
+      required: [true, "Meta description is required."],
+      trim: true,
+    },
+
+    content_meta_keywords: {
+      type: [String],
+      required: [true, "Meta keywords are required."],
+      validate: {
+        validator: function (keywords) {
+          return (
+            Array.isArray(keywords) &&
+            keywords.every((keyword) => typeof keyword === "string")
+          );
+        },
+        message: "Meta keywords include invalid keyword(s).",
       },
-      required: [true, "Content type must be specified."],
-      lowercase: true,
       trim: true,
     },
   },
@@ -96,6 +94,25 @@ const Schema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
+// * Document Middleware
+Schema.pre("save", function (next) {
+  try {
+    // Setting slug
+    if (this.isModified("content_title"))
+      this.content_slug = generateSlug(this.content_title);
+
+    // Converting array to set
+    if (this.isModified("content_meta_keywords"))
+      this.content_meta_keywords = Array.from(
+        new Set(this.content_meta_keywords)
+      );
+
+    next();
+  } catch (e) {
+    next(e);
+  }
+});
 
 const Content = mongoose.model("Content", Schema);
 module.exports = Content;

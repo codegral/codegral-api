@@ -24,27 +24,6 @@ exports.getCategory = async function (req, res, next) {
   }
 };
 
-exports.createCategory = async function (req, res, next) {
-  try {
-    const { category_name } = req.body;
-
-    const category = await Category.create({
-      category_name: category_name.toLowerCase(),
-    });
-
-    Response.send(
-      res,
-      201,
-      "success",
-      "Category has been created.",
-      undefined,
-      { category }
-    );
-  } catch (e) {
-    next(e);
-  }
-};
-
 exports.updateCategory = async function (req, res, next) {
   try {
     const { categoryId } = req.params;
@@ -59,7 +38,7 @@ exports.updateCategory = async function (req, res, next) {
       res,
       201,
       "success",
-      `The category has been updated.`,
+      `Category ${category.category_name} has been updated successfully.`,
       undefined,
       { category }
     );

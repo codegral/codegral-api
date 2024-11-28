@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { checkApiKey } = require("../middlewares/index.middleware");
+const { checkApiKey } = require("../middlewares/index.middlewares");
 
 // * API Key Middleware
 router.use(checkApiKey);

@@ -1,7 +1,4 @@
 const mongoose = require("mongoose");
-const {
-  isSubcategoryValid,
-} = require("../../../utils/helpers/category.helpers");
 require("../../Content");
 
 const Schema = new mongoose.Schema(

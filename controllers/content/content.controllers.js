@@ -1,5 +1,5 @@
-const Content = require("../models/Content");
-const Response = require("../utils/Response");
+const Content = require("../../models/Content");
+const Response = require("../../utils/Response");
 
 exports.getContents = async function (req, res, next) {
   try {

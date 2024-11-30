@@ -1,5 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+
+const storage = multer({ storage: multer.memoryStorage() });
 
 const {
   getContents,
@@ -8,18 +11,26 @@ const {
 } = require("../../controllers/content/content.controllers");
 
 const {
-  checkCategoryValid,
+  checkCategoryValidity,
 } = require("../../middlewares/category/category.middlewares");
 
 const {
-  checkSubcategoriesValid,
+  checkSubcategoriesValidity,
 } = require("../../middlewares/subcategory/subcategory.middlewares");
 
-router
-  .route("/")
-  .get(getContents)
-  // * Category & Subcategory Validation Middleware
-  .post(checkCategoryValid, checkSubcategoriesValid, createContent);
+const {
+  createContentThumbnailImageBuffer,
+} = require("../../middlewares/content/content.middlewares");
+
+router.route("/").get(getContents).post(
+  // * Middleware(s)
+  checkCategoryValidity,
+  checkSubcategoriesValidity,
+  // * Multer
+  storage.single("content_thumbnail_image"),
+  createContentThumbnailImageBuffer,
+  createContent
+);
 
 router.route("/:contentId").get(getContent);
 

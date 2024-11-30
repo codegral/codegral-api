@@ -75,15 +75,23 @@ const Schema = new mongoose.Schema(
     content_meta_keywords: {
       type: [String],
       required: [true, "Meta keywords are required."],
-      validate: {
-        validator: function (keywords) {
-          return (
-            Array.isArray(keywords) &&
-            keywords.every((keyword) => typeof keyword === "string")
-          );
+      validate: [
+        {
+          validator: function (keywords) {
+            return (
+              Array.isArray(keywords) &&
+              keywords.every((keyword) => typeof keyword === "string")
+            );
+          },
+          message: "Meta keywords include invalid keyword(s).",
         },
-        message: "Meta keywords include invalid keyword(s).",
-      },
+        {
+          validator: function (keywords) {
+            return keywords.length > 0;
+          },
+          message: "Meta keywords cannot be empty.",
+        },
+      ],
       trim: true,
     },
   },

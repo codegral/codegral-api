@@ -1,4 +1,8 @@
+// * ENV
 const dotenv = require("dotenv");
+dotenv.config({ path: `.env.dev` });
+
+// * Initialize
 const express = require("express");
 const expressRateLimit = require("express-rate-limit");
 const ExpressMongoSanitize = require("express-mongo-sanitize");
@@ -10,11 +14,9 @@ const routes = require("./routes/index.routes");
 const { createAppError } = require("./utils/helpers/error.helpers");
 const errorController = require("./controllers/error/error.controller");
 
-// * ENV
-dotenv.config({ path: ".env" });
-
 // * Express
 const app = express();
+app.use(express.json());
 
 // * Limit
 const limit = expressRateLimit({
@@ -25,7 +27,7 @@ const limit = expressRateLimit({
   legacyHeaders: false,
 });
 
-app.use(express.json({ limit }));
+app.use(limit);
 
 // * Security
 app.use(ExpressMongoSanitize());
@@ -35,26 +37,30 @@ app.use(helmet());
 // * Server
 const server = http.createServer(app);
 
-server.listen(process.env.PORT, "0.0.0.0", () =>
+server.listen(process.env.PORT, "0.0.0.0", function (err) {
+  if (err) {
+    console.error("Error starting server: ", err);
+    server.close(() => process.exit(1));
+  }
+
   console.log(
     `Server is started to listen for HTTP requests on PORT ${process.env.PORT}`
-  )
-);
+  );
+});
 
 // * MongoDB
 (async function () {
-  const ENVIRONMENT = process.env.ENVIRONMENT;
-
   try {
-    await mongoose.connect(
-      ENVIRONMENT === "dev"
-        ? process.env.MONGODB_URL_DEV
-        : process.env.MONGODB_URL_PROD
+    await mongoose.connect(process.env.MONGODB_URL);
+
+    console.log(
+      `Connection to the MongoDB (${process.env.NODE_ENV}) is successful.`
+    );
+  } catch (e) {
+    console.error(
+      `Connection to the MongoDB (${process.env.NODE_ENV}) is failed.`
     );
 
-    console.log(`Connection to the MongoDB (${ENVIRONMENT}) is successful.`);
-  } catch (e) {
-    console.error(`Connection to the MongoDB (${ENVIRONMENT}) is failed.`);
     console.error(e);
   }
 })();

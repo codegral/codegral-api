@@ -5,7 +5,7 @@ const {
 } = require("../../utils/helpers/subcategory/subcategory.helpers");
 const { createAppError } = require("../../utils/helpers/error.helpers");
 
-exports.checkSubcategoriesValid = async function (req, res, next) {
+exports.checkSubcategoriesValidity = async function (req, res, next) {
   try {
     const { content_subcategories } = req.body;
 

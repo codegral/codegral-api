@@ -2,8 +2,6 @@ const sharp = require("sharp");
 
 exports.createContentThumbnailImageBuffer = async function (req, res, next) {
   try {
-    console.log("req.file: ", req.file);
-
     if (req.file && req.file.fieldname === "content_thumbnail_image") {
       req.content_thumbnail_image_buffer = await sharp(req.file.buffer)
         .resize({

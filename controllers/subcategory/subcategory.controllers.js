@@ -1,5 +1,5 @@
-const Subcategory = require("../../models/categories/subcategory/Subcategory");
-const Category = require("../../models/categories/Category");
+const Subcategory = require("../../models/subcategory/Subcategory");
+const Category = require("../../models/category/Category");
 const Response = require("../../utils/Response");
 
 exports.getSubcategories = async function (req, res, next) {

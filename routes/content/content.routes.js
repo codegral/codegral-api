@@ -4,11 +4,11 @@ const multer = require("multer");
 
 const storage = multer({ storage: multer.memoryStorage() });
 
+const { parseJSON } = require("../../middlewares/index.middlewares");
+
 const {
-  getContents,
-  createContent,
-  getContent,
-} = require("../../controllers/content/content.controllers");
+  createContentThumbnailImageBuffer,
+} = require("../../middlewares/content/content.middlewares");
 
 const {
   checkCategoryValidity,
@@ -19,16 +19,25 @@ const {
 } = require("../../middlewares/subcategory/subcategory.middlewares");
 
 const {
-  createContentThumbnailImageBuffer,
-} = require("../../middlewares/content/content.middlewares");
+  getContents,
+  createContent,
+  getContent,
+} = require("../../controllers/content/content.controllers");
 
 router.route("/").get(getContents).post(
-  // * Middleware(s)
+  // Multer
+  storage.single("content_thumbnail_image"),
+
+  // Thumbnail Middleware
+  createContentThumbnailImageBuffer,
+
+  // Parse JSON Middleware
+  parseJSON,
+
+  // Category Middleware(s)
   checkCategoryValidity,
   checkSubcategoriesValidity,
-  // * Multer
-  storage.single("content_thumbnail_image"),
-  createContentThumbnailImageBuffer,
+
   createContent
 );
 

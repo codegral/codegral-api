@@ -8,6 +8,7 @@ exports.createContentThumbnailImageBuffer = async function (req, res, next) {
           width: 1200,
           height: 675,
           fit: "cover",
+          position: "center",
         })
         .toFormat("webp")
         .webp({ quality: 100 })

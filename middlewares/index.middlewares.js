@@ -13,3 +13,25 @@ exports.checkApiKey = function (req, res, next) {
     next(e);
   }
 };
+
+exports.parseJSON = function (req, res, next) {
+  try {
+    // Debug
+    console.log("req.body: ", req.body);
+
+    Object.keys(req.body).forEach((key) => {
+      if (typeof req.body[key] === "string" && req.body[key] !== "") {
+        try {
+          req.body[key] = JSON.parse(req.body[key]);
+        } catch (e) {
+          console.error(`Error parsing ${key} with value ${req.body[key]}`);
+          console.error(e);
+        }
+      }
+    });
+
+    next();
+  } catch (e) {
+    next(e);
+  }
+};

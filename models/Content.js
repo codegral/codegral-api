@@ -80,10 +80,13 @@ const Schema = new mongoose.Schema(
           validator: function (keywords) {
             return (
               Array.isArray(keywords) &&
-              keywords.every((keyword) => typeof keyword === "string")
+              keywords.every(
+                (keyword) =>
+                  typeof keyword === "string" && keyword.trim().length > 0
+              )
             );
           },
-          message: "Meta keywords include invalid keyword(s).",
+          message: "Meta keywords include invalid keyword(s) or empty strings.",
         },
         {
           validator: function (keywords) {
@@ -92,7 +95,6 @@ const Schema = new mongoose.Schema(
           message: "Meta keywords cannot be empty.",
         },
       ],
-      trim: true,
     },
   },
   {

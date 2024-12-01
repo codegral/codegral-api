@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-require("../../Content");
+require("../Content");
 
 const Schema = new mongoose.Schema(
   {

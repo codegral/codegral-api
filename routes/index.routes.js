@@ -8,6 +8,6 @@ router.use(checkApiKey);
 
 // * Routes
 router.use("/contents", require("./content/content.routes"));
-router.use("/categories", require("./category/category.routes"));
+router.use("/categories", require("./categories/category.routes"));
 
 module.exports = router;

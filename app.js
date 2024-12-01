@@ -4,6 +4,7 @@ dotenv.config({ path: `.env.dev` });
 
 // * Initialize
 const express = require("express");
+const cors = require("cors");
 const expressRateLimit = require("express-rate-limit");
 const ExpressMongoSanitize = require("express-mongo-sanitize");
 const hpp = require("hpp");
@@ -16,18 +17,26 @@ const errorController = require("./controllers/error/error.controller");
 
 // * Express
 const app = express();
+
+// * Parse JSON
 app.use(express.json());
 
-// * Limit
-const limit = expressRateLimit({
-  max: 100,
-  windowsMs: 60 * 60 * 1000,
-  message: "Too many request!",
-  standartHeaders: true,
-  legacyHeaders: false,
-});
+// * Parse URL Encoded
+app.use(express.urlencoded({ extended: true }));
 
-app.use(limit);
+// * CORS
+app.use(cors({ origin: "*" }));
+
+// * API Limit
+app.use(
+  expressRateLimit({
+    max: 100,
+    windowsMs: 60 * 60 * 1000,
+    message: "Too many request!",
+    standartHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 // * Security
 app.use(ExpressMongoSanitize());

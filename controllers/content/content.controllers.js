@@ -1,6 +1,5 @@
 const Content = require("../../models/Content");
 const Response = require("../../utils/Response");
-const mongoose = require("mongoose");
 const { AWS_REGION, AWS_BUCKET, AWS_S3 } = require("../../aws.s3.config");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 
@@ -28,6 +27,8 @@ exports.getContent = async function (req, res, next) {
 
 exports.createContent = async function (req, res, next) {
   try {
+    console.log("req.body: ", req.body);
+
     const {
       content_title,
       content_brief,
@@ -37,6 +38,7 @@ exports.createContent = async function (req, res, next) {
     } = req.body;
 
     const content_thumbnail_image_buffer = req.content_thumbnail_image_buffer;
+    const content_body_images_buffers = req.content_body_images_buffers;
     const categories = req.categories;
     const subcategories = req.subcategories;
 
@@ -52,31 +54,26 @@ exports.createContent = async function (req, res, next) {
       content_meta_keywords,
     });
 
-    let thumbnailParams;
     if (content_thumbnail_image_buffer) {
-      const Key = `contents/${content.content_slug}/thumbnail/${content.content_slug}_thumbnail.webp`;
+      const Key = `contents/${content._id}/thumbnail/${content._id}_thumbnail.webp`;
 
-      thumbnailParams = {
+      const thumbnailParams = {
         Bucket: AWS_BUCKET,
         Key,
         Body: req.content_thumbnail_image_buffer,
-        ContentType: req.file.mimetype,
+        ContentType: "image/webp",
       };
 
       try {
-        const command = new PutObjectCommand(thumbnailParams);
-        const response = await AWS_S3.send(command);
+        const putObjectCommand = new PutObjectCommand(thumbnailParams);
+        await AWS_S3.send(putObjectCommand);
 
         content.content_thumbnail = `https://${AWS_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${Key}`;
         await content.save();
-
-        console.log("Thumbnail has been uploaded successfully.");
-        console.log("Response: ", response);
       } catch (e) {
-        console.error("Error uploading file: ", e);
+        console.error("Error uploading content thumbnail: ", e);
 
         await Content.findByIdAndDelete(content._id);
-
         return next(e);
       }
     } else {
@@ -84,9 +81,38 @@ exports.createContent = async function (req, res, next) {
       await content.save();
     }
 
+    if (content_body_images_buffers) {
+      let uploadedContentBodyImagesObjectURLS = [];
+      const contentBodyImagesPromises = content_body_images_buffers.map(
+        async function (content_body_image_buffer, index) {
+          const Key = `contents/${content._id}/images/${content._id}_body_image_${index}.webp`;
+
+          const bodyImageParams = {
+            Bucket: AWS_BUCKET,
+            Key,
+            Body: content_body_image_buffer,
+            ContentType: "image/webp",
+          };
+
+          try {
+            uploadedContentBodyImagesObjectURLS.push(Key);
+            return AWS_S3.send(new PutObjectCommand(bodyImageParams));
+          } catch (e) {
+            console.error("Error uploading content images: ", e);
+
+            await Content.findByIdAndDelete(content._id);
+            return next(e);
+          }
+        }
+      );
+
+      await Promise.all(contentBodyImagesPromises);
+    }
+
     req.categories = undefined;
     req.subcategories = undefined;
     req.content_thumbnail_image_buffer = undefined;
+    req.content_body_images_buffers = undefined;
 
     Response.send(
       res,

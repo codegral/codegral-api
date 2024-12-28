@@ -27,8 +27,8 @@ const Schema = new mongoose.Schema(
           trim: true,
         },
 
-        content_body_paragraph: {
-          type: String,
+        content_body_paragraphs: {
+          type: [String],
           trim: true,
         },
 
@@ -37,8 +37,8 @@ const Schema = new mongoose.Schema(
           trim: true,
         },
 
-        content_body_image: {
-          type: String,
+        content_body_images: {
+          type: [String],
           trim: true,
         },
 
@@ -63,6 +63,7 @@ const Schema = new mongoose.Schema(
     content_slug: {
       type: String,
       unique: true,
+      lowercase: true,
       trim: true,
     },
 
@@ -95,6 +96,7 @@ const Schema = new mongoose.Schema(
           message: "Meta keywords cannot be empty.",
         },
       ],
+      lowercase: true,
     },
   },
   {

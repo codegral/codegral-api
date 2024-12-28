@@ -16,10 +16,7 @@ exports.checkApiKey = function (req, res, next) {
 
 exports.parseJSON = function (req, res, next) {
   try {
-    // Debug
-    console.log("req.body: ", req.body);
-
-    Object.keys(req.body).forEach((key) => {
+    Object.keys(req.body).forEach(function (key) {
       if (typeof req.body[key] === "string" && req.body[key] !== "") {
         try {
           req.body[key] = JSON.parse(req.body[key]);

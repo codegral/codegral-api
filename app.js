@@ -30,7 +30,7 @@ app.use(cors({ origin: "*" }));
 // * API Limit
 app.use(
   expressRateLimit({
-    max: 100,
+    max: 1000,
     windowsMs: 60 * 60 * 1000,
     message: "Too many request!",
     standartHeaders: true,
@@ -53,7 +53,7 @@ server.listen(process.env.PORT, "0.0.0.0", function (err) {
   }
 
   console.log(
-    `Server is started to listen for HTTP requests on PORT ${process.env.PORT}`
+    `Server is started to listen for HTTP requests in ${process.env.NODE_ENV} on PORT ${process.env.PORT}`
   );
 });
 
@@ -61,7 +61,6 @@ server.listen(process.env.PORT, "0.0.0.0", function (err) {
 (async function () {
   try {
     await mongoose.connect(process.env.MONGODB_URL);
-
     console.log(
       `Connection to the MongoDB (${process.env.NODE_ENV}) is successful.`
     );
@@ -69,7 +68,6 @@ server.listen(process.env.PORT, "0.0.0.0", function (err) {
     console.error(
       `Connection to the MongoDB (${process.env.NODE_ENV}) is failed.`
     );
-
     console.error(e);
   }
 })();

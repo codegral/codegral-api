@@ -1,7 +1,7 @@
 const Category = require("../../models/category/Category");
 const { createAppError } = require("../../utils/helpers/error.helpers");
 
-exports.checkCategoryValidity = async function (req, res, next) {
+exports.checkCategoriesValidity = async function (req, res, next) {
   try {
     const { content_categories } = req.body;
 

@@ -19,7 +19,6 @@ const Schema = new mongoose.Schema(
           "mobile",
           "design",
         ],
-
         message: "Invalid category name.",
       },
       required: [true, "Content must belong to at least one category."],

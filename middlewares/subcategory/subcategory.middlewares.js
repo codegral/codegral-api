@@ -14,8 +14,6 @@ exports.checkSubcategoriesValidity = async function (req, res, next) {
 
     const subcategories = await Promise.all(
       content_subcategories.map(async function (content_subcategory) {
-        const subcategories = [];
-
         for (const category of req.categories) {
           if (!isSubcategoryValid(category.category_name, content_subcategory))
             return next(
@@ -27,12 +25,8 @@ exports.checkSubcategoriesValidity = async function (req, res, next) {
             );
 
           const subcategory = await Subcategory.findOneAndUpdate(
-            {
-              subcategory_name: content_subcategory,
-            },
-            {
-              $addToSet: { subcategory_parents: category._id },
-            },
+            { subcategory_name: content_subcategory },
+            { $addToSet: { subcategory_parents: category._id } },
             { upsert: true, new: true, runValidators: true }
           );
 
@@ -58,10 +52,8 @@ exports.checkSubcategoriesValidity = async function (req, res, next) {
             { upsert: true, new: true, runValidators: true }
           );
 
-          subcategories.push(subcategory);
+          return subcategory;
         }
-
-        return subcategories;
       })
     );
 

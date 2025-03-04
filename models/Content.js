@@ -20,45 +20,70 @@ const Schema = new mongoose.Schema(
       trim: true,
     },
 
-    content_body: [
+    content_body: {
+      type: String,
+      required: [true, "Content body is required."],
+    },
+
+    // content_body: [
+    //   {
+    //     content_body_title: {
+    //       type: String,
+    //       trim: true,
+    //     },
+
+    //     content_body_paragraphs: {
+    //       type: [String],
+    //       trim: true,
+    //     },
+
+    //     content_body_codes: {
+    //       type: [Object],
+    //     },
+
+    //     content_body_lists: {
+    //       type: [String],
+    //       trim: true,
+    //     },
+
+    //     content_body_images: {
+    //       type: [String],
+    //       trim: true,
+    //     },
+
+    //     content_body_video: {
+    //       type: String,
+    //       trim: true,
+    //     },
+    //   },
+    // ],
+
+    // content_categories: {
+    //   type: [mongoose.Schema.Types.ObjectId],
+    //   ref: "Category",
+    //   required: [true, "Content must belong to a category."],
+    // },
+
+    // content_subcategories: {
+    //   type: [mongoose.Schema.Types.ObjectId],
+    //   ref: "Subcategory",
+    //   required: false,
+    // },
+
+    content_categories: [
       {
-        content_body_title: {
-          type: String,
-          trim: true,
+        parent_category: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Category",
+          required: [true, "Content must belong to a category."],
         },
 
-        content_body_paragraphs: {
-          type: [String],
-          trim: true,
-        },
-
-        content_body_lists: {
-          type: [String],
-          trim: true,
-        },
-
-        content_body_images: {
-          type: [String],
-          trim: true,
-        },
-
-        content_body_video: {
-          type: String,
-          trim: true,
+        subcategories: {
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: "Subcategory",
         },
       },
     ],
-
-    content_categories: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "Category",
-      required: [true, "Content must belong to a category."],
-    },
-
-    content_subcategories: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "Subcategory",
-    },
 
     content_slug: {
       type: String,

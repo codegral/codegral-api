@@ -2,52 +2,45 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 
-const storage = multer({ storage: multer.memoryStorage() });
+const storage = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fieldSize: 10 * 1024 * 1024, // 10 MB
+  },
+});
 
-const { parseJSON } = require("../../middlewares/index.middlewares");
-
-const {
-  // createContentThumbnailImageBuffer,
-  // createContentBodyImagesBuffer,
-  createContentImagesBuffers,
-} = require("../../middlewares/content/content.middlewares");
+const { parseJSON } = require("../../middlewares/index.middleware");
 
 const {
   checkCategoriesValidity,
-} = require("../../middlewares/category/category.middlewares");
+} = require("../../middlewares/categories/index.middleware");
 
 const {
-  checkSubcategoriesValidity,
-} = require("../../middlewares/subcategory/subcategory.middlewares");
+  createContentThumbnailBuffer,
+} = require("../../middlewares/content/content.middleware");
 
 const {
   getContents,
   createContent,
   getContent,
-} = require("../../controllers/content/content.controllers");
+} = require("../../controllers/content/content.controller");
 
-router
-  .route("/")
-  .get(getContents)
-  .post(
-    // Multer
-    storage.fields([
-      { name: "content_thumbnail_image", maxCount: 1 },
-      { name: "content_body_images" },
-    ]),
+router.route("/").get(getContents).post(
+  // Multer
+  storage.single("content_thumbnail"),
 
-    // Content Images Middleware
-    createContentImagesBuffers,
+  // Content Thumbnail Middleware
+  createContentThumbnailBuffer,
 
-    // Parse JSON Middleware
-    parseJSON,
+  // Parse JSON Middleware
+  parseJSON,
 
-    // Category Middleware(s)
-    checkCategoriesValidity,
-    checkSubcategoriesValidity,
+  // Category Middleware
+  checkCategoriesValidity,
 
-    createContent
-  );
+  // Launch the controller
+  createContent
+);
 
 router.route("/:contentId").get(getContent);
 

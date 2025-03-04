@@ -28,7 +28,7 @@ const Schema = new mongoose.Schema(
 // * Virtual Populating
 Schema.virtual("subcategory_contents", {
   ref: "Content",
-  foreignField: "content_subcategory",
+  foreignField: "content_category.subcategories",
   localField: "_id",
 });
 

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { CATEGORIES } = require("../../consts/index.consts");
 require("../Content");
 
 const Schema = new mongoose.Schema(
@@ -6,19 +7,7 @@ const Schema = new mongoose.Schema(
     category_name: {
       type: String,
       enum: {
-        values: [
-          "software",
-          "tech",
-          "development",
-          "programming languages",
-          "frameworks & libraries",
-          "operating systems",
-          "artificial intelligence",
-          "database",
-          "cyber security",
-          "mobile",
-          "design",
-        ],
+        values: CATEGORIES.map((category) => category.parent_category),
         message: "Invalid category name.",
       },
       required: [true, "Content must belong to at least one category."],
@@ -43,7 +32,7 @@ const Schema = new mongoose.Schema(
 // * Virtual Populating
 Schema.virtual("category_contents", {
   ref: "Content",
-  foreignField: "content_categories",
+  foreignField: "content_categories.parent_category",
   localField: "_id",
 });
 

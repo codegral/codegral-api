@@ -1,9 +1,9 @@
-const Category = require("../../models/category/Category");
-const Subcategory = require("../../models/subcategory/Subcategory");
+const Category = require("../../../models/category/Category");
+const Subcategory = require("../../../models/subcategory/Subcategory");
 const {
   isSubcategoryValid,
-} = require("../../utils/helpers/subcategory/subcategory.helpers");
-const { createAppError } = require("../../utils/helpers/error.helpers");
+} = require("../../../utils/helpers/subcategory/subcategory.helpers");
+const { createAppError } = require("../../../utils/helpers/error.helpers");
 
 exports.checkSubcategoriesValidity = async function (req, res, next) {
   try {

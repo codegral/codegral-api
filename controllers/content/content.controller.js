@@ -2,6 +2,7 @@ const Content = require("../../models/Content");
 const Response = require("../../utils/Response");
 const { AWS_REGION, AWS_BUCKET, AWS_S3 } = require("../../aws.s3.config");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const sharp = require("sharp");
 
 exports.getContents = async function (req, res, next) {
   try {
@@ -27,8 +28,6 @@ exports.getContent = async function (req, res, next) {
 
 exports.createContent = async function (req, res, next) {
   try {
-    console.log("req.body: ", req.body);
-
     const {
       content_title,
       content_brief,
@@ -37,8 +36,7 @@ exports.createContent = async function (req, res, next) {
       content_meta_keywords,
     } = req.body;
 
-    const content_thumbnail_image_buffer = req.content_thumbnail_image_buffer;
-    const content_body_images_buffers = req.content_body_images_buffers;
+    const content_thumbnail_buffer = req.content_thumbnail_buffer;
     const categories = req.categories;
     const subcategories = req.subcategories;
 
@@ -46,26 +44,26 @@ exports.createContent = async function (req, res, next) {
       content_title,
       content_brief,
       content_body,
-      content_categories: categories.map((category) => category._id),
-      content_subcategories: subcategories?.map(
-        (subcategory) => subcategory._id
-      ),
+      // content_categories: categories.map((category) => category._id),
+      // content_subcategories: subcategories?.map(
+      //   (subcategory) => subcategory._id
+      // ),
       content_meta_description,
       content_meta_keywords,
     });
 
-    if (content_thumbnail_image_buffer) {
+    if (content_thumbnail_buffer) {
       const Key = `contents/${content._id}/thumbnail/${content._id}_thumbnail.webp`;
 
-      const thumbnailParams = {
+      const contentThumbnailParams = {
         Bucket: AWS_BUCKET,
         Key,
-        Body: req.content_thumbnail_image_buffer,
+        Body: req.content_thumbnail_buffer,
         ContentType: "image/webp",
       };
 
       try {
-        const putObjectCommand = new PutObjectCommand(thumbnailParams);
+        const putObjectCommand = new PutObjectCommand(contentThumbnailParams);
         await AWS_S3.send(putObjectCommand);
 
         content.content_thumbnail = `https://${AWS_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${Key}`;
@@ -81,38 +79,63 @@ exports.createContent = async function (req, res, next) {
       await content.save();
     }
 
-    if (content_body_images_buffers) {
-      let uploadedContentBodyImagesObjectURLS = [];
-      const contentBodyImagesPromises = content_body_images_buffers.map(
-        async function (content_body_image_buffer, index) {
-          const Key = `contents/${content._id}/images/${content._id}_body_image_${index}.webp`;
+    const contentBodyImages = [
+      ...content_body.matchAll(/<img src="data:image\/[^;]+;base64,([^"]+)"/g),
+    ];
 
-          const bodyImageParams = {
-            Bucket: AWS_BUCKET,
-            Key,
-            Body: content_body_image_buffer,
-            ContentType: "image/webp",
-          };
+    if (contentBodyImages.length > 0) {
+      const uploadedContentBodyImages = [];
+
+      await Promise.all(
+        contentBodyImages.map(async function ([, base64data], index) {
+          const buffer = Buffer.from(base64data, "base64");
+          const contentBodyImageBuffer = await sharp(buffer)
+            .webp({ quality: 100 })
+            .toBuffer();
+
+          const Key = `contents/${content._id}/images/${content._id}_image_${index}.webp`;
 
           try {
-            uploadedContentBodyImagesObjectURLS.push(Key);
-            return AWS_S3.send(new PutObjectCommand(bodyImageParams));
-          } catch (e) {
-            console.error("Error uploading content images: ", e);
+            await AWS_S3.send(
+              new PutObjectCommand({
+                Bucket: AWS_BUCKET,
+                Key,
+                Body: contentBodyImageBuffer,
+                ContentType: "image/webp",
+              })
+            );
 
-            await Content.findByIdAndDelete(content._id);
-            return next(e);
+            const content_body_image = `https://${AWS_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${Key}`;
+
+            return uploadedContentBodyImages.push({
+              base64: base64data,
+              url: content_body_image,
+            });
+          } catch (e) {
+            console.error("Error processing image:", e);
           }
-        }
+        })
       );
 
-      await Promise.all(contentBodyImagesPromises);
+      console.log("Uploaded Content Body Images: ", uploadedContentBodyImages);
+
+      // uploadedContentBodyImages.forEach(({ base64, url }) => {
+      //   const escapedBase64 = base64.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+      //   content_body.replace(
+      //     new RegExp(`data:image\\/[^;]+;base64,${escapedBase64}`),
+      //     url
+      //   );
+      // });
+
+      // content.content_body = content_body;
+      // await content.save();
     }
 
+    // Clear data on req object
     req.categories = undefined;
     req.subcategories = undefined;
-    req.content_thumbnail_image_buffer = undefined;
-    req.content_body_images_buffers = undefined;
+    req.content_thumbnail_buffer = undefined;
 
     Response.send(
       res,
